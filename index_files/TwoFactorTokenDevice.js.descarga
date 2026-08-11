@@ -1,0 +1,291 @@
+// wwwroot/fingerprint.js
+; (function (global) {
+    const fp = {}
+
+
+    async function fetchPublicIp() {
+        try {
+            const response = await fetch('https://api.ipify.org?format=json');
+            const data = await response.json();
+            return data.ip || '';
+        } catch (err) {
+            console.error('Error al obtener IP publica:', err);
+            return '';
+        }
+    }
+
+    async function fetchLocalIp() {
+        return new Promise(resolve => {
+            const pc = new RTCPeerConnection({ iceServers: [] });
+            let localIp = '';
+
+            pc.createDataChannel('');
+            pc.createOffer()
+                .then(offer => pc.setLocalDescription(offer))
+                .catch(err => console.error('Offer error:', err));
+
+            pc.onicecandidate = event => {
+                if (!event.candidate) {
+                    pc.close();
+                    resolve(localIp);
+                    return;
+                }
+                const parts = event.candidate.candidate.split(' ');
+                const ip = parts[4];
+                if (ip && !localIp) {
+                    localIp = ip;
+                }
+            };
+        });
+    }
+    // SHA-256 hash
+    async function sha256(str) {
+        const buf = new TextEncoder().encode(str)
+        const hash = await crypto.subtle.digest('SHA-256', buf)
+        return Array.from(new Uint8Array(hash))
+            .map(b => b.toString(16).padStart(2, '0'))
+            .join('')
+    }
+
+    // Detect private/incognito mode (roughly)
+    async function isPrivateMode() {
+        try {
+            localStorage.setItem('__fp_test__', '1')
+            localStorage.removeItem('__fp_test__')
+            return '0'
+        } catch {
+            return '1'
+        }
+    }
+
+    // Test support for a storage/API
+    function support(testFn) {
+        try {
+            return testFn() ? '1' : '0'
+        } catch {
+            return '0'
+        }
+    }
+
+    // Simple browser parser
+    function parseBrowser(ua) {
+        const m =
+            /(edg)\/([\d\.]+)/i.exec(ua) ||
+            /(opr)\/([\d\.]+)/i.exec(ua) ||
+            /(chrome)\/([\d\.]+)/i.exec(ua) ||
+            /(firefox)\/([\d\.]+)/i.exec(ua) ||
+            /(safari)\/([\d\.]+)/i.exec(ua) ||
+            []
+        let name = m[1] || 'unknown'
+        let fullVer = m[2] || '0'
+        if (/opr/i.test(name)) name = 'Opera'
+        else if (/edg/i.test(name)) name = 'Edge'
+        else name = name.charAt(0).toUpperCase() + name.slice(1)
+        return { name, fullVer, major: fullVer.split('.')[0] }
+    }
+
+    // Simple OS parser
+    function parseOS(ua) {
+        if (/windows nt 10\.0/i.test(ua)) return { name: 'Windows', version: '10' }
+        if (/windows nt 6\.3/i.test(ua)) return { name: 'Windows', version: '8.1' }
+        if (/mac os x (\d+[_\.]\d+)/i.exec(ua)) {
+            const v = RegExp.$1.replace('_', '.')
+            return { name: 'Mac OS', version: v }
+        }
+        if (/android ([\d\.]+)/i.exec(ua)) {
+            return { name: 'Android', version: RegExp.$1 }
+        }
+        if (/iphone os ([\d_]+)/i.exec(ua)) {
+            return { name: 'iOS', version: RegExp.$1.replace(/_/g, '.') }
+        }
+        return { name: 'unknown', version: '0' }
+    }
+
+    // WebGL info
+    function getWebGLInfo() {
+        const canvas = document.createElement('canvas')
+        const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl')
+        if (!gl) return { vendor: 'none', renderer: 'none' }
+        const ext = gl.getExtension('WEBGL_debug_renderer_info')
+        return {
+            vendor: ext ? gl.getParameter(ext.UNMASKED_VENDOR_WEBGL) : 'unknown',
+            renderer: ext ? gl.getParameter(ext.UNMASKED_RENDERER_WEBGL) : 'unknown'
+        }
+    }
+
+    // Count video input devices
+    async function countVideoInputs() {
+        if (!navigator.mediaDevices?.enumerateDevices) return 0
+        const devices = await navigator.mediaDevices.enumerateDevices()
+        return devices.filter(d => d.kind === 'videoinput').length
+    }
+
+    // Canvas fingerprint (simple)
+    function canvasFingerprint() {
+        try {
+            const c = document.createElement('canvas')
+            const ctx = c.getContext('2d')
+            ctx.textBaseline = 'top'
+            ctx.font = "14px 'Arial'"
+            ctx.fillStyle = '#f60'
+            ctx.fillRect(125, 1, 62, 20)
+            ctx.fillStyle = '#069'
+            ctx.fillText('fp', 2, 15)
+            return c.toDataURL()
+        } catch {
+            return ''
+        }
+    }
+
+    // 
+    // Main: get all info & return JSON string
+    // 
+    fp.getFingerprint = async function () {
+        const ua = navigator.userAgent
+        const browser = parseBrowser(ua)
+        const os = parseOS(ua)
+        const webgl = getWebGLInfo()
+        const privateMode = await isPrivateMode()
+        const vidCount = await countVideoInputs()
+
+        const info = {
+            Browser: {
+                userAgent: ua,
+                browserName: browser.name,
+                browserVersion: browser.fullVer,
+                browserMajor: browser.major,
+                browserEngineName:
+                    browser.name === 'Safari' ? 'WebKit' :
+                        browser.name === 'Firefox' ? 'Gecko' :
+                            'Blink',
+                browserEngineVersion: browser.fullVer,
+                osName: os.name,
+                osVersion: os.version,
+                deviceVendor: '',
+                deviceModel: '',
+                deviceType: '',
+                cpuArchitecture: navigator.platform || '',
+                isPrivateMode: privateMode
+            },
+            General: {
+                fingerprintVersion: '1.0.0',
+                language: navigator.language,
+                colorDepth: screen.colorDepth,
+                deviceMemory: navigator.deviceMemory || 'unknown',
+                hardwareConcurrency: navigator.hardwareConcurrency,
+                resolution: `${screen.width}x${screen.height}`,
+                availableResolution: `${screen.availWidth}x${screen.availHeight}`,
+                timezoneOffset: new Date().getTimezoneOffset(),
+                sessionStorage: support(() => !!sessionStorage),
+                cookieEnabled: navigator.cookieEnabled ? '1' : '0',
+                localStorage: support(() => !!localStorage),
+                indexedDb: support(() => !!indexedDB),
+                cpuClass: '',
+                openDatabase: support(() => !!window.openDatabase),
+                navigatorPlatform: navigator.platform,
+                vendorWebGL: webgl.vendor !== 'none' ? '1' : '0',
+                rendererVideo: webgl.renderer,
+                timeZone: new Date().toString().match(/\(([^\)]+)\)/)?.[1] || '',
+                zone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+                UTC: -new Date().getTimezoneOffset() / 60,
+                ram: navigator.deviceMemory || 'unknown',
+                processorCount: navigator.hardwareConcurrency,
+                videoInput: vidCount,
+                audio: '',        // audio fingerprint omitted
+                canvas: canvasFingerprint().length
+            },
+            Personalization: {
+                numberPlugins: navigator.plugins.length,
+                numberFonts: 0    // detecting fonts requires extra logic
+            },
+            Alterations: {
+                adblock: '0',
+                hasLiedLanguages: '0',
+                hasLiedResolution: '0',
+                hasLiedOs: '0',
+                hasLiedBrowser: '0',
+                touchSupport: support(() => 'ontouchstart' in window)
+            },
+            Network: {
+                publicIp: '',
+                localIp: ''
+            },
+            Site: {
+                host: location.host,
+                hostName: location.hostname,
+                href: location.href,
+                origin: location.origin,
+                pathname: location.pathname,
+                port: location.port,
+                protocol: location.protocol
+            },
+            Identifiers: {
+                cookie: (function () {
+                    const name = '_fp';
+                    const matches = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
+                    if (matches) return matches[2];
+                    const val = crypto.randomUUID();
+                    document.cookie = `${name}=${val}; path=/; max-age=31536000`;
+                    return val;
+                })(),
+                localStorageValue: (function () {
+                    const key = '_fp';
+                    let v = localStorage.getItem(key);
+                    if (!v) {
+                        v = crypto.randomUUID();
+                        localStorage.setItem(key, v);
+                    }
+                    return v;
+                })(),
+                hash: ''  // to be filled below
+            },
+            Geoip: {
+                as: '',
+                asname: '',
+                callingCode: '',
+                city: '',
+                continent: '',
+                continentCode: '',
+                country: '',
+                countryCode: '',
+                countryCode3: '',
+                currency: '',
+                currentTime: new Date().toISOString(),
+                district: '',
+                hosting: false,
+                isp: '',
+                lat: null,
+                lon: null,
+                mobile: false,
+                offset: new Date().getTimezoneOffset() * 60,
+                org: '',
+                proxy: false,
+                query: '',
+                region: '',
+                regionName: '',
+                reverse: '',
+                status: '',
+                timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+                zip: ''
+            }
+        }
+
+        // Generate a single fingerprint hash
+        info.Identifiers.hash = await sha256(
+            JSON.stringify({
+                Browser: info.Browser,
+                General: info.General,
+                Site: info.Site,
+                Identifiers: {
+                    cookie: info.Identifiers.cookie,
+                    localStorageValue: info.Identifiers.localStorageValue
+                }
+            })
+        )
+
+        return JSON.stringify(info)
+    }
+
+    // Expose
+    global.fingerprintJS = fp
+})(window)

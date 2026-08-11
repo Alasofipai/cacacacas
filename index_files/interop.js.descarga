@@ -1,0 +1,338 @@
+﻿// Variables
+let currentlatitude;
+let currentlongitude;
+let map, infobox, tooltip;
+let tooltipTemplate = '<div style="background-color:white;text-align:center;margin-top:-25px;border-radius: 25px;"><b>{title}</b></div>';
+let branchlatitude;
+let branchlongitude;
+let directionsManager;
+
+
+function StartSgEngine(dotnetHelper) {
+    window.LoginGlobalDotNet = dotnetHelper;
+    StartSignatureEngine(SignatureResponse);
+}
+
+function digitalSign(user) {
+    if (stateGFSConnection != statesGFSConnection.connected) {
+        console.log("Reconectando firma digital " + stateGFSConnection);
+        StartSignatureEngine(SignatureResponse);
+    }
+    console.log("GFS State " + stateGFSConnection);
+
+    ConnectSignatureEngine(user, null);
+}
+
+function SignatureResponse(status, gfsRefNumber) {
+    console.log("SignatureResponse: " + status + " - " + gfsRefNumber);
+    window.LoginGlobalDotNet.invokeMethodAsync('DigitalSignLogin', gfsRefNumber);
+    if (status) {
+        $('#GFSModal').modal('hide');
+    }
+}
+
+function StartSgEngineCreateUser(dotnetHelper) {
+    window.CreateUserGlobalDotNet = dotnetHelper;
+    StartSignatureEngine(SignatureResponseCreateUser);
+}
+
+function SignatureResponseCreateUser(status, gfsRefNumber) {
+    console.log("SignatureResponse: " + status + " - " + gfsRefNumber);
+
+    window.CreateUserGlobalDotNet.invokeMethodAsync('RegisterUserDigitalSign', gfsRefNumber);
+    if (status) {
+        $('#GFSModal').modal('hide');
+    }
+}
+
+function StartSgEngineCallback(dotnetHelper) {
+    window.LoginGlobalDotNet = dotnetHelper;
+    StartSignatureEngine(SignatureCallbackResponse);
+}
+
+function SignatureCallbackResponse(status, gfsRefNumber) {
+    console.log("SignatureResponse: " + status + " - " + gfsRefNumber);
+    window.LoginGlobalDotNet.invokeMethodAsync('DigitalSignCallback', gfsRefNumber);
+    if (status) {
+        $('#GFSModal').modal('hide');
+    }
+}
+
+function setPopover(_target, _content, _title, _position, istooltip) {
+
+    $('#' + _target).popover({
+        html: true,
+        content: function () {
+            return $("#popover_content_" + _target).html();
+        },
+        placement: _position,
+        trigger: istooltip === "1" ? 'hover' : 'focus'
+    });
+}
+
+function mask(_id, _mask) {
+    $("#" + _id).mask(_mask);
+}
+
+function maskReverse(_id, _mask) {
+    $("#" + _id).mask(_mask, { reverse: true });
+}
+
+function openInNewTab(url) {
+    let win = window.open(url, '_blank');
+    win.focus();
+}
+
+function setPopoverContent(id) {
+    return document.getElementById(id).innerHTML;
+}
+
+function showCollapse(target) {
+    $(".panel-collapse").removeClass("show");
+    $('.panel-collapse').collapse("hide");
+    $('#' + target).addClass("show");
+}
+
+function setClassElement(id) {
+    $(".card").removeClass("category-item-active");
+    $("#itemmenu" + id).addClass("category-item-active");
+}
+
+function hideCollapse(target) {
+    $('.panel-collapse').collapse("hide");
+}
+
+function printSelection(id) {
+    let ficha = document.getElementById(id);
+    let ventimp = window.open(' ', 'popimpr');
+    ventimp.document.write(ficha.innerHTML);
+    ventimp.document.close();
+    ventimp.print();
+    ventimp.close();
+}
+
+
+
+//SliderBar Functions---------
+
+function updateSliderToolText(text, id) {
+    $("#" + id).slider('setAttribute', 'formatter', function (value) {
+        return value + ' ' + text;
+    });
+}
+
+function updateSliderMinMax(minvalue, maxvalue, id) {
+
+    $("#" + id).slider('setAttribute', 'min', Number(minvalue));
+    $("#" + id).slider('setAttribute', 'max', Number(maxvalue));
+    $("#" + id).slider('setValue', Number(minvalue));
+}
+
+function initSlider(tooltext, id, applyFormat) {
+    $(document).ready(function () {
+        window.mySlider = $("#" + id).slider({
+            tooltip_position: 'bottom',
+            tooltip: 'always',
+            formatter: function (value) {
+
+                if (applyFormat == "1") {
+                    return security.formatCurrency(value);
+                }
+
+                return value;
+                
+            }
+        });        
+
+        $("#" + id).on("slideStop", function (slideEvt) {
+            window.sliderGlobalDotNet.invokeMethodAsync('getSliderValueClicked', slideEvt.value);
+        });
+
+    });
+}
+
+function sliderHelper(dotnetHelper) {
+    window.sliderGlobalDotNet = dotnetHelper;
+}
+//Fin SliderBar Functions---------
+
+
+// Blazor Scroll to Id
+function scrollToId(id) {
+    const element = document.getElementById(id);
+    if (element instanceof HTMLElement) {
+        element.scrollIntoView({
+            behavior: 'smooth',
+            block: 'start',
+            inline: 'nearest'
+        });
+    }
+}
+
+function scrollTop(id) {
+    let element = document.getElementById(id);
+
+    if (element) {
+        element.scrollTop = 0;
+    }
+}
+
+function scrollToTop() {
+    window.scroll({ top: 0, left: 0, behavior: 'smooth' });
+}
+
+function BlazorDownloadFile(filename, contentType, content) {
+    try {
+        
+        const data = base64DecToArr(content);
+        const fileOptions = { type: contentType };
+        const file = new File([data], filename, fileOptions);
+        const exportUrl = URL.createObjectURL(file);
+        
+        
+        const link = document.createElement("a");
+        link.href = exportUrl;
+        link.download = filename;
+        link.target = "_self";
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+
+        URL.revokeObjectURL(exportUrl);
+    } catch (error) {
+        console.error(error);
+    }
+}
+
+
+
+function downloadBase64File(filename, contentType, content) {
+
+    var bytes = new Uint8Array(content); // pass your byte response to this constructor
+
+    var blob = new Blob([bytes], { type: "application/pdf" });// change resultByte to bytes
+
+    var link = document.createElement('a');
+    link.href = window.URL.createObjectURL(blob);
+    link.download = "myFileName.pdf";
+    link.click();
+}
+
+function downloadFromByteArray(fileName, contentType, byteArray) {
+
+    // Convert base64 string to numbers array.
+    const numArray = atob(byteArray).split('').map(c => c.charCodeAt(0));
+
+    // Convert numbers array to Uint8Array object.
+    const uint8Array = new Uint8Array(numArray);
+
+    // Wrap it by Blob object.
+    const blob = new Blob([uint8Array], { type: contentType });
+
+    // Create "object URL" that is linked to the Blob object.
+    const url = URL.createObjectURL(blob);
+
+    // Invoke download helper function that implemented in 
+    // the earlier section of this article.
+    downloadFromUrl(url, fileName);
+
+    // At last, release unused resources.
+    URL.revokeObjectURL(url);
+}
+
+function downloadFromStream(fileName, mimeType, base64String) {
+    var fileDataUrl = "data:" + mimeType + ";base64," + base64String;
+    fetch(fileDataUrl)
+        .then(response => response.blob())
+        .then(blob => {
+
+            //create a link
+            var link = window.document.createElement("a");
+            link.href = window.URL.createObjectURL(blob, { type: mimeType });
+            link.download = fileName;
+
+            //add, click and remove
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        });
+}
+
+
+// Convert a base64 string to a Uint8Array. 
+function b64ToUint6(nChr) {
+    if (nChr > 64 && nChr < 91) {
+        return nChr - 65;
+    }
+    if (nChr > 96 && nChr < 123) {
+        return nChr - 71;
+    }
+    if (nChr > 47 && nChr < 58) {
+        return nChr + 4;
+    }
+    if (nChr === 43) {
+        return 62;
+    }
+    if (nChr === 47) {
+        return 63;
+    }
+    return 0;
+}
+
+function base64DecToArr(sBase64, nBlocksSize) {
+    if (sBase64 instanceof Uint8Array) {
+        // Si sBase64 ya es un Uint8Array, devolverlo tal cual
+        return sBase64;
+    }
+
+    // Eliminar los caracteres no válidos de la cadena de texto
+    const sB64Enc = sBase64.replace(/[^A-Za-z0-9+/]/g, '');
+
+    // Calcular el tamaño de salida en bytes
+    const nInLen = sB64Enc.length;
+    const nOutLen = nBlocksSize ? Math.ceil(nInLen * 3 / 4 / nBlocksSize) * nBlocksSize : nInLen * 3 / 4;
+
+    // Crear un nuevo Uint8Array para almacenar la salida
+    const taBytes = new Uint8Array(nOutLen);
+
+    // Decodificar la cadena base64 y escribir los bytes decodificados en el Uint8Array de salida
+    let nUint24 = 0;
+    let nOutIdx = 0;
+    for (let nInIdx = 0; nInIdx < nInLen; nInIdx++) {
+        nUint24 |= b64ToUint6(sB64Enc.charCodeAt(nInIdx)) << 18 - 6 * (nInIdx % 4);
+        if (nInIdx % 4 === 3 || nInIdx === nInLen - 1) {
+            for (let nMod3 = 0; nMod3 < 3 && nOutIdx < nOutLen; nMod3++, nOutIdx++) {
+                taBytes[nOutIdx] = nUint24 >>> (16 >>> nMod3 & 24) & 255;
+            }
+            nUint24 = 0;
+        }
+    }
+
+    // Devolver el Uint8Array de salida
+    return taBytes;
+}
+
+
+
+// Carousel
+
+function initializeCarousel(id, interval) {
+
+    let intervalValue = parseInt(interval);
+
+    $('#' + id).carousel({
+        interval: intervalValue,
+        pause: "hover"
+    })
+}
+
+function refreshCarousel(id) {
+    let car = $('#' + id);
+
+    if (car) {
+        car.find('.carousel-indicators li').removeClass('active');
+        car.find('.carousel-indicators li').first().addClass('active');
+        car.find('.carousel-item').removeClass('active');
+        car.find('.carousel-item').first().addClass('active');
+    }
+}

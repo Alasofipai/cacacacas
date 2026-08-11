@@ -1,0 +1,253 @@
+﻿//v2.1.0.007
+
+var baseURL = "https://www.odbanking.com";
+
+const GFSConnection = $.hubConnection(baseURL + "/PS.GFS.Web.0804/SignalR");
+
+const GFSConnectionHub = GFSConnection.createHubProxy('DigitalSignHub');
+
+const statesGFSConnection = { connecting: 0, connected: 1, reconnecting: 2, disconnected: 4 };
+
+let stateGFSConnection = 0;
+
+let gfsCallbackResponse = null;
+
+let gfsTimeoutId = null;
+
+
+GFSConnectionHub.on('notifyChangeGroup', function () {
+    if ($('#GFSModal').is(':visible')) {
+
+        if (typeof $('#GFSModal').modal === "function") {
+            $('#GFSModal').modal('toggle');
+        } else {
+            //Bootstrap 5
+            const modal = new bootstrap.Modal('#GFSModal');
+            modal.toggle();
+        }
+    }
+});
+
+GFSConnectionHub.on('riseWaitingModal', function (seconds, html) {
+    secondsToHide = seconds * 1000;
+    //Clean
+    $("#GFSmodalContent").empty();
+    //Set HTML
+    $("#GFSmodalContent").append(html);
+    //Show
+    if (!$('#GFSModal').is(':visible')) {
+
+        if (typeof $('#GFSModal').modal === "function") {
+            $('#GFSModal').modal('toggle');
+        } else {
+            //Bootstrap 5
+            const modal = new bootstrap.Modal('#GFSModal');
+            modal.toggle();
+        }
+    }
+
+    GFSTimerToHideModal(seconds, false);
+});
+
+GFSConnectionHub.on('successResponse', function (transactionId) {
+    GFSTimerToHideModal(null, true);
+
+    if ($('#GFSModal').is(':visible')) {
+        if (typeof $('#GFSModal').modal === "function") {
+            $('#GFSModal').modal('toggle');
+        } else {
+            //Bootstrap 5
+            const modal = new bootstrap.Modal('#GFSModal');
+            modal.toggle();
+        }
+    }
+
+    $("#GFSmodalContent").empty();
+
+    if ($.isFunction(gfsCallbackResponse)) {
+        gfsCallbackResponse(true, transactionId);
+    }
+
+    /*if (UserConnected) {
+        GFSConnectionHub.invoke('disconnect', UserConnected);
+        UserConnected = null;
+    }*/
+});
+
+GFSConnectionHub.on('failureResponse', function (transactionId) {
+    GFSTimerToHideModal(null, true);
+
+    if ($('#GFSModal').is(':visible')) {
+        if (typeof $('#GFSModal').modal === "function") {
+            $('#GFSModal').modal('toggle');
+        } else {
+            //Bootstrap 5
+            const modal = new bootstrap.Modal('#GFSModal');
+            modal.toggle();
+        }
+    }
+
+    $("#GFSmodalContent").empty();
+
+    if ($.isFunction(gfsCallbackResponse)) {
+        gfsCallbackResponse(false, transactionId);
+    }
+
+    /*if (UserConnected) {
+        GFSConnectionHub.invoke('disconnect', UserConnected);
+        UserConnected = null;
+    }*/
+});
+
+// Pseudocódigo detallado:
+// 1. Detectar cuando la conexión está en estado 'disconnected'.
+// 2. Intentar reconectar automáticamente después de un intervalo (ej. 2 segundos).
+// 3. Limitar el número de intentos de reconexión para evitar bucles infinitos.
+// 4. Limpiar el temporizador si la reconexión es exitosa.
+// 5. Mostrar mensajes en consola sobre el estado de la reconexión.
+
+let gfsReconnectAttempts = 0;
+const gfsMaxReconnectAttempts = 10;
+const gfsReconnectInterval = 2000; // 2 segundos
+let gfsReconnectTimeoutId = null;
+
+function GFSConnectionStateChanged(state) {
+    stateGFSConnection = state.newState;
+
+    switch (stateGFSConnection) {
+        case statesGFSConnection.connecting:
+            console.info("GFSConnectionStateChanged: Nuevo estado [Connecting] - " + new Date().toLocaleString());
+            break;
+        case statesGFSConnection.connected:
+            console.info("GFSConnectionStateChanged: Nuevo estado [Connected] - " + new Date().toLocaleString());
+            // Si la reconexión fue exitosa, limpiar intentos y temporizador
+            gfsReconnectAttempts = 0;
+            if (gfsReconnectTimeoutId) {
+                clearTimeout(gfsReconnectTimeoutId);
+                gfsReconnectTimeoutId = null;
+            }
+            break;
+        case statesGFSConnection.reconnecting:
+            console.info("GFSConnectionStateChanged: Nuevo estado [Reconnecting] - " + new Date().toLocaleString());
+            break;
+        case statesGFSConnection.disconnected:
+            console.info("GFSConnectionStateChanged: Nuevo estado [Disconnected] - " + new Date().toLocaleString());
+            // Intentar reconectar automáticamente
+            if (gfsReconnectAttempts < gfsMaxReconnectAttempts) {
+                gfsReconnectAttempts++;
+                console.info(`Intentando reconectar... (Intento ${gfsReconnectAttempts} de ${gfsMaxReconnectAttempts})`);
+                gfsReconnectTimeoutId = setTimeout(function () {
+                    GFSConnection.start().fail(function () {
+                        // Si falla, el estado volverá a 'disconnected' y se reintentará
+                    });
+                }, gfsReconnectInterval);
+            } else {
+                console.error("No se pudo reconectar después de varios intentos.");
+            }
+            break;
+    }
+}
+
+GFSConnection.stateChanged(GFSConnectionStateChanged);
+
+GFSConnection.start().done(function () {
+
+});
+
+function GFSTimerToHideModal(seconds, exit) {
+    if (!exit) {
+        gfsTimeoutId = setTimeout(function (seconds) {
+            if ($('#GFSModal').is(':visible')) {
+                if (typeof $('#GFSModal').modal === "function") {
+                    $('#GFSModal').modal('hide');
+                } else {
+                    //Bootstrap 5
+                    const modal = new bootstrap.Modal('#GFSModal');
+                    modal.hide();
+                }
+            }
+        }, secondsToHide);
+    }
+    else if (exit) {
+        clearTimeout(gfsTimeoutId);
+    }
+}
+
+function GFSprepareModal() {
+    $('body').append(
+
+        ' <!-- Modal --> ' +
+        ' <div class="modal fade" id="GFSModal" role= "dialog" data-keyboard="false" data-backdrop="static" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true"> ' +
+        ' <div class="modal-dialog" style="white-space: normal;"> ' +
+        '   <!-- Modal content--> ' +
+        ' <div class="modal-content"> ' +
+        '              <div class="modal-header"> ' +
+        '                <h4 class="modal-title fs-5" id="staticBackdropLabel">Esperando Firma Digital</h4> ' +
+        '           </div> ' +
+        '          <div class="modal-body"> ' +
+        '             <div id="GFSmodalContent" class="col-md-12"> ' +
+        '             </div > ' +
+        '        </div> ' +
+        '       <div class="modal-footer"> ' +
+        '     </div> ' +
+        ' </div> ' +
+        ' </div> ' +
+        ' </div>'
+    );
+}
+
+//GFS Library
+function StartSignatureEngine(callBackResponse, userId) {
+    gfsTimeoutId = null;
+
+    //Initialize Hub
+    if (userId) {
+        if (stateGFSConnection !== statesGFSConnection.connected) {
+            setTimeout(function () {
+                StartSignatureEngine(callBackResponse, userId);
+            }, 250);
+            return;
+        }
+
+        UserConnected = null;
+        GFSConnectionHub.invoke('connect', userId).done(function () { })
+            .fail(function (error) {
+                alert(error.message);
+            });
+    }
+    GFSprepareModal();
+
+    gfsCallbackResponse = callBackResponse;
+}
+
+function ConnectSignatureEngine(userId, invoke) {
+    if (userId) {
+        UserConnected = userId;
+
+		//Se garantiza que la conexion se encuentre abierta.
+		GFSConnection.start();
+
+        if (stateGFSConnection !== statesGFSConnection.connected) {
+            setTimeout(function () {
+                ConnectSignatureEngine(userId, invoke);
+            }, 250);
+            return;
+        }
+
+        GFSConnectionHub.invoke('connect', userId).done(function () {
+            if ($.isFunction(invoke)) {
+                invoke();
+            }
+        }).fail(function (error) {
+            alert(error.message);
+        });
+    }
+}
+
+function GFSCopyToClipboard(element) {
+    var $temp = $("<input>");
+    $("body").append($temp);
+    $temp.val($(element).text()).select();
+    document.execCommand("copy");
+    $temp.remove();
+}
